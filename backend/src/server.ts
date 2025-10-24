@@ -1,5 +1,4 @@
-
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import apiRoutes from './routes';
@@ -13,11 +12,16 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// API Routes
+// =================================================================
+// Routes de l'API
+// Toutes les routes de l'application sont chargées à partir du
+// routeur principal défini dans './routes/index.ts'.
+// Cette approche modulaire garde ce fichier propre et organisé.
+// =================================================================
 app.use('/api', apiRoutes);
 
 // Health check route
-app.get('/', (req: express.Request, res: express.Response) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Éclat Commerce Backend is running!');
 });
 

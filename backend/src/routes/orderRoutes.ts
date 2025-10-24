@@ -1,9 +1,15 @@
 
 import { Router } from 'express';
-import { createOrder } from '../controllers/orderController';
+import { createOrder, getAllOrders, updateOrderStatus } from '../controllers/orderController';
+import { protect } from '../middleware/authMiddleware';
 
 const router = Router();
 
-router.post('/', createOrder);
+router.route('/')
+    .post(createOrder) // Public route for placing an order
+    .get(protect, getAllOrders); // Protected route for admins
+
+router.route('/:id/status')
+    .put(protect, updateOrderStatus); // Protected route for admins
 
 export default router;
