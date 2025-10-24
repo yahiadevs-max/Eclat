@@ -1,5 +1,5 @@
 
-import { Request, Response } from 'express';
+import express from 'express';
 import { pool } from '../db';
 import { RowDataPacket, OkPacket } from 'mysql2';
 
@@ -17,7 +17,7 @@ interface OrderPayload {
     total: number;
 }
 
-export const createOrder = async (req: Request, res: Response) => {
+export const createOrder = async (req: express.Request, res: express.Response) => {
     const { customerDetails, orderItems, total } = req.body as OrderPayload;
     const connection = await pool.getConnection();
 

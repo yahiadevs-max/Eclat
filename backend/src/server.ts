@@ -1,5 +1,5 @@
 
-import express, { Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import apiRoutes from './routes';
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use('/api', apiRoutes);
 
 // Health check route
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req: express.Request, res: express.Response) => {
   res.send('Éclat Commerce Backend is running!');
 });
 

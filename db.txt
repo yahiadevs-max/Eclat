@@ -55,7 +55,6 @@ CREATE TABLE `product_images` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `product_id` INT NOT NULL,
   `image_url` VARCHAR(255) NOT NULL,
-  `is_primary` BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -78,14 +77,22 @@ CREATE TABLE `product_colors` (
 -- Table: customers
 CREATE TABLE `customers` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(255) NOT NULL
+  `name` VARCHAR(255) NOT NULL,
+  `firstname` VARCHAR(255),
+  `lastname` VARCHAR(255),
+  `phone` VARCHAR(50),
+  `email` VARCHAR(255),
+  `country` VARCHAR(255),
+  `city` VARCHAR(255),
+  `commune` VARCHAR(255),
+  `address` TEXT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Table: orders
 CREATE TABLE `orders` (
   `id` VARCHAR(255) PRIMARY KEY,
   `customer_id` INT,
-  `order_date` DATE NOT NULL,
+  `order_date` DATETIME NOT NULL,
   `total` DECIMAL(10, 2) NOT NULL,
   `status` ENUM('En attente', 'Expédiée', 'Livrée', 'Annulée') NOT NULL,
   FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE SET NULL
@@ -97,8 +104,10 @@ CREATE TABLE `order_items` (
   `order_id` VARCHAR(255) NOT NULL,
   `product_id` INT NOT NULL,
   `quantity` INT NOT NULL,
-  FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`)
+  `price` DECIMAL(10, 2) NOT NULL,
+  `size` VARCHAR(50),
+  `color` VARCHAR(50),
+  FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Table: admins
@@ -160,7 +169,7 @@ CREATE TABLE `blog_posts` (
   `id` INT PRIMARY KEY,
   `title` VARCHAR(255) NOT NULL,
   `author` VARCHAR(255),
-  `publish_date` DATE,
+  `date` DATE,
   `excerpt` TEXT,
   `image_url` VARCHAR(255)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -171,19 +180,19 @@ CREATE TABLE `blog_posts` (
 -- =================================================================
 
 -- Data: brands
-INSERT INTO `brands` (`name`) VALUES
-('ÉcoMode'), ('Denim & Co'), ('Urban Walkers'), ('Fleur Chic'), ('Aventure Urbaine'), ('Le Temps Précis'), ('Chaleur Douce'), ('Essence Rare'), ('BellePeau'), ('L\'Élégant');
+INSERT INTO `brands` (`id`, `name`) VALUES
+(1, 'ÉcoMode'), (2, 'Denim & Co'), (3, 'Urban Walkers'), (4, 'Fleur Chic'), (5, 'Aventure Urbaine'), (6, 'Le Temps Précis'), (7, 'Chaleur Douce'), (8, 'Essence Rare'), (9, 'BellePeau'), (10, 'L\'Élégant');
 
 -- Data: categories
-INSERT INTO `categories` (`name`) VALUES
-('Hommes'), ('Femmes'), ('Accessoires'), ('Soins & Beauté');
+INSERT INTO `categories` (`id`, `name`) VALUES
+(1, 'Hommes'), (2, 'Femmes'), (3, 'Accessoires'), (4, 'Soins & Beauté');
 
 -- Data: subcategories
-INSERT INTO `subcategories` (`category_id`, `name`) VALUES
-(1, 'T-shirts'), (1, 'Jeans'), (1, 'Chaussures'), (1, 'Chemises'),
-(2, 'Robes'), (2, 'Pulls'), (2, 'Bottes'), (2, 'Jupes'),
-(3, 'Sacs'), (3, 'Montres'),
-(4, 'Parfums'), (4, 'Crèmes');
+INSERT INTO `subcategories` (`id`, `category_id`, `name`) VALUES
+(1, 1, 'T-shirts'), (2, 1, 'Jeans'), (3, 1, 'Chaussures'), (4, 1, 'Chemises'),
+(5, 2, 'Robes'), (6, 2, 'Pulls'), (7, 2, 'Bottes'), (8, 2, 'Jupes'),
+(9, 3, 'Sacs'), (10, 3, 'Montres'),
+(11, 4, 'Parfums'), (12, 4, 'Crèmes');
 
 -- Data: products
 INSERT INTO `products` (`id`, `name`, `brand_id`, `price`, `category_id`, `subcategory_id`, `description`, `stock`, `rating`, `reviews`) VALUES
@@ -201,19 +210,19 @@ INSERT INTO `products` (`id`, `name`, `brand_id`, `price`, `category_id`, `subca
 (12, 'Jupe Plissée Mi-longue', 4, 59.99, 2, 8, 'Jupe plissée élégante et polyvalente. Tissu fluide et agréable à porter en toute saison.', 45, 4.8, 115);
 
 -- Data: product_images
-INSERT INTO `product_images` (`product_id`, `image_url`, `is_primary`) VALUES
-(1, 'https://picsum.photos/id/10/800/800', TRUE), (1, 'https://picsum.photos/id/11/800/800', FALSE),
-(2, 'https://picsum.photos/id/20/800/800', TRUE), (2, 'https://picsum.photos/id/21/800/800', FALSE),
-(3, 'https://picsum.photos/id/30/800/800', TRUE), (3, 'https://picsum.photos/id/31/800/800', FALSE),
-(4, 'https://picsum.photos/id/40/800/800', TRUE), (4, 'https://picsum.photos/id/41/800/800', FALSE),
-(5, 'https://picsum.photos/id/50/800/800', TRUE), (5, 'https://picsum.photos/id/51/800/800', FALSE),
-(6, 'https://picsum.photos/id/60/800/800', TRUE), (6, 'https://picsum.photos/id/61/800/800', FALSE),
-(7, 'https://picsum.photos/id/70/800/800', TRUE), (7, 'https://picsum.photos/id/71/800/800', FALSE),
-(8, 'https://picsum.photos/id/80/800/800', TRUE), (8, 'https://picsum.photos/id/81/800/800', FALSE),
-(9, 'https://picsum.photos/id/90/800/800', TRUE), (9, 'https://picsum.photos/id/91/800/800', FALSE),
-(10, 'https://picsum.photos/id/100/800/800', TRUE), (10, 'https://picsum.photos/id/101/800/800', FALSE),
-(11, 'https://picsum.photos/id/110/800/800', TRUE), (11, 'https://picsum.photos/id/111/800/800', FALSE),
-(12, 'https://picsum.photos/id/120/800/800', TRUE), (12, 'https://picsum.photos/id/121/800/800', FALSE);
+INSERT INTO `product_images` (`product_id`, `image_url`) VALUES
+(1, 'https://picsum.photos/id/10/800/800'), (1, 'https://picsum.photos/id/11/800/800'),
+(2, 'https://picsum.photos/id/20/800/800'), (2, 'https://picsum.photos/id/21/800/800'),
+(3, 'https://picsum.photos/id/30/800/800'), (3, 'https://picsum.photos/id/31/800/800'),
+(4, 'https://picsum.photos/id/40/800/800'), (4, 'https://picsum.photos/id/41/800/800'),
+(5, 'https://picsum.photos/id/50/800/800'), (5, 'https://picsum.photos/id/51/800/800'),
+(6, 'https://picsum.photos/id/60/800/800'), (6, 'https://picsum.photos/id/61/800/800'),
+(7, 'https://picsum.photos/id/70/800/800'), (7, 'https://picsum.photos/id/71/800/800'),
+(8, 'https://picsum.photos/id/80/800/800'), (8, 'https://picsum.photos/id/81/800/800'),
+(9, 'https://picsum.photos/id/90/800/800'), (9, 'https://picsum.photos/id/91/800/800'),
+(10, 'https://picsum.photos/id/100/800/800'), (10, 'https://picsum.photos/id/101/800/800'),
+(11, 'https://picsum.photos/id/110/800/800'), (11, 'https://picsum.photos/id/111/800/800'),
+(12, 'https://picsum.photos/id/120/800/800'), (12, 'https://picsum.photos/id/121/800/800');
 
 -- Data: product_sizes
 INSERT INTO `product_sizes` (`product_id`, `size`) VALUES
@@ -240,7 +249,7 @@ INSERT INTO `product_colors` (`product_id`, `color`) VALUES
 
 -- Data: customers
 INSERT INTO `customers` (`id`, `name`) VALUES
-(1, 'Alice Martin'), (2, 'Bob Dupont'), (3, 'Claire Durand'), (4, 'David Petit');
+(1, 'Alice Martin'), (2, 'Bob Dupont'), (3, 'Claire Durand'), (4, 'David Petit'), (5, 'Eve Leroy'), (6, 'Frank Moreau'), (7, 'Grace Simon');
 
 -- Data: orders
 INSERT INTO `orders` (`id`, `customer_id`, `order_date`, `total`, `status`) VALUES
@@ -250,18 +259,18 @@ INSERT INTO `orders` (`id`, `customer_id`, `order_date`, `total`, `status`) VALU
 ('#123-456792', 4, '2024-05-18', 250.00, 'Annulée');
 
 -- Data: order_items
-INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`) VALUES
-('#123-456789', 1, 1),
-('#123-456789', 2, 1),
-('#123-456790', 3, 1),
-('#123-456791', 4, 1),
-('#123-456791', 5, 1),
-('#123-456792', 6, 1);
+INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`) VALUES
+('#123-456789', 1, 1, 29.99),
+('#123-456789', 2, 1, 79.90),
+('#123-456790', 3, 1, 119.99),
+('#123-456791', 4, 1, 65.00),
+('#123-456791', 5, 1, 55.50),
+('#123-456792', 6, 1, 250.00);
 
 -- Data: admins
 INSERT INTO `admins` (`id`, `username`, `email`, `password_hash`, `role`) VALUES
-(1, 'yahia', 'yahia.admin@eclat.com', '$2a$10$w8.Y2w.N8Q.z9c5.j5BwTeStgX.a2y.d1XG/V5GzLzG2aW/vK2Iq.', 'superadmin'),
-(2, 'admin', 'admin.user@eclat.com', '$2a$10$oFjC.pD5e6e7f8.g9H.i.e/uJ.Z3k.l4O5B6j7K8l9M0n1o2p3q.', 'admin');
+(1, 'yahia', 'yahia.admin@eclat.com', '$2a$10$E4.V7.hMSLz38I3n.H5y3.rxjVIdOnK4Aj2G5.2VbS22z.IqV/j8a', 'superadmin'),
+(2, 'admin', 'admin.user@eclat.com', '$2a$10$Q4e.2i0.Pwt29T7j7.BqFOsKkXk2q5k7g3g.l2s9.r0c5.x8b0.pC', 'admin');
 
 -- Data: admin_permissions
 INSERT INTO `admin_permissions` (`admin_id`, `permission`) VALUES
@@ -282,4 +291,10 @@ INSERT INTO `shipping_costs` (`wilaya`, `cost`) VALUES
 INSERT INTO `deliveries` (`order_id`, `customer_name`, `address`, `shipping_date`, `tracking_number`, `status`) VALUES
 ('#123-456789', 'Alice Martin', '123 Rue de Paris, 75001 Paris', '2024-05-21', 'LP123456789FR', 'Livrée'),
 ('#123-456790', 'Bob Dupont', '45 Avenue de Lyon, 69002 Lyon', '2024-05-22', 'LP987654321FR', 'En transit'),
-('#123-45
+('#123-456791', 'Claire Durand', '78 Boulevard de Marseille, 13008 Marseille', 'N/A', 'N/A', 'Préparation');
+
+-- Data: payments
+INSERT INTO `payments` (`transaction_id`, `order_id`, `customer_name`, `amount`, `payment_date`, `status`) VALUES
+('txn_1a2b3c4d5e', '#123-456789', 'Alice Martin', 109.89, '2024-05-20', 'Réussi'),
+('txn_6f7g8h9i0j', '#123-456790', 'Bob Dupont', 119.99, '2024-05-21', 'Réussi'),
+('txn_k1l2m3n4o5', '#123-45

@@ -1,5 +1,5 @@
 
-import { Request, Response } from 'express';
+import express from 'express';
 import { pool } from '../db';
 import { RowDataPacket } from 'mysql2';
 
@@ -46,7 +46,7 @@ const processProductRows = (rows: any[]) => {
     }));
 };
 
-export const getAllProducts = async (req: Request, res: Response) => {
+export const getAllProducts = async (req: express.Request, res: express.Response) => {
     try {
         const [rows] = await pool.query<RowDataPacket[]>(BASE_PRODUCT_QUERY);
         res.json(processProductRows(rows));
@@ -56,7 +56,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     }
 };
 
-export const getProductById = async (req: Request, res: Response) => {
+export const getProductById = async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     try {
         const query = `${BASE_PRODUCT_QUERY} WHERE p.id = ?`;

@@ -1,5 +1,5 @@
 
-import { Request, Response } from 'express';
+import express from 'express';
 import { pool } from '../db';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -16,7 +16,7 @@ interface Permission extends RowDataPacket {
     permission: string;
 }
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: express.Request, res: express.Response) => {
     const { username, password } = req.body;
     
     if (!username || !password) {
