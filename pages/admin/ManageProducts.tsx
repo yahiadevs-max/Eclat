@@ -1,7 +1,10 @@
+
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { products as initialProducts, categories } from '../../data/products';
 import { Product } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { ScraperIcon } from '../../components/icons';
 
 const ManageProducts: React.FC = () => {
   const { user } = useAuth();
@@ -9,6 +12,8 @@ const ManageProducts: React.FC = () => {
   const [isFormModalOpen, setIsFormModalOpen] = React.useState(false);
   const [editingProduct, setEditingProduct] = React.useState<Product | null>(null);
   const [productToDelete, setProductToDelete] = React.useState<Product | null>(null);
+
+  const canScrape = user?.role === 'superadmin' || !!user?.permissions?.scraper;
 
   if (user?.role !== 'superadmin' && !user?.permissions?.products) {
     return (
@@ -56,9 +61,17 @@ const ManageProducts: React.FC = () => {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold">Gestion des Produits</h2>
-        <button onClick={() => openFormModal()} className="bg-accent hover:bg-accent-hover text-white font-semibold py-2 px-4 rounded-md text-sm transition-colors">
-          Ajouter un Produit
-        </button>
+        <div className="flex items-center space-x-4">
+          {canScrape && (
+            <Link to="/admin/scraper" className="bg-white border border-accent text-accent hover:bg-accent hover:text-white font-semibold py-2 px-4 rounded-md text-sm transition-colors flex items-center space-x-2">
+              <ScraperIcon className="w-4 h-4" />
+              <span>Importer un Produit</span>
+            </Link>
+          )}
+          <button onClick={() => openFormModal()} className="bg-accent hover:bg-accent-hover text-white font-semibold py-2 px-4 rounded-md text-sm transition-colors">
+            Ajouter un Produit
+          </button>
+        </div>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">

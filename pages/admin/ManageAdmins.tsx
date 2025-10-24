@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AdminPermissions } from '../../context/AuthContext';
@@ -25,6 +26,7 @@ const initialAdmins: AdminUser[] = [
       payments: false,
       returns: false,
       shipping: true,
+      scraper: true,
     }
   },
 ];
@@ -37,6 +39,7 @@ const permissionLabels: { [key in keyof AdminPermissions]: string } = {
   shipping: "Frais de Port",
   payments: "Paiements",
   returns: "Retours",
+  scraper: "Importation",
 };
 
 const ManageAdmins: React.FC = () => {
@@ -63,7 +66,7 @@ const ManageAdmins: React.FC = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'admin' | 'superadmin'>('admin');
   const [permissions, setPermissions] = useState<AdminPermissions>({
-    products: false, orders: false, stock: false, deliveries: false, payments: false, returns: false, shipping: false,
+    products: false, orders: false, stock: false, deliveries: false, payments: false, returns: false, shipping: false, scraper: false,
   });
 
   const handlePermissionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +90,7 @@ const ManageAdmins: React.FC = () => {
     setEmail('');
     setPassword('');
     setRole('admin');
-    setPermissions({ products: false, orders: false, stock: false, deliveries: false, payments: false, returns: false, shipping: false });
+    setPermissions({ products: false, orders: false, stock: false, deliveries: false, payments: false, returns: false, shipping: false, scraper: false });
   };
 
   const handleDelete = (adminToDelete: AdminUser) => {

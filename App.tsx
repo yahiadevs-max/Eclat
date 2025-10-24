@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
@@ -26,6 +27,7 @@ import ManagePayments from './pages/admin/ManagePayments';
 import ManageReturns from './pages/admin/ManageReturns';
 import ManageAdmins from './pages/admin/ManageAdmins';
 import ManageShipping from './pages/admin/ManageShipping';
+import ProductScraper from './pages/admin/ProductScraper';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -60,6 +62,7 @@ const App: React.FC = () => {
             }
           >
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="scraper" element={<ProductScraper />} />
             <Route path="products" element={<ManageProducts />} />
             <Route path="orders" element={<ManageOrders />} />
             <Route path="stock" element={<ManageStock />} />

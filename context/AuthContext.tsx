@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 export interface AdminPermissions {
@@ -8,6 +9,7 @@ export interface AdminPermissions {
   payments: boolean;
   returns: boolean;
   shipping: boolean;
+  scraper: boolean;
 }
 
 interface User {
@@ -46,6 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           payments: false,
           returns: false,
           shipping: true,
+          scraper: true,
         }
       });
       return true;

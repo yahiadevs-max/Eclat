@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth, AdminPermissions } from '../../context/AuthContext';
@@ -11,6 +12,7 @@ import {
   ReturnIcon,
   AdminsIcon,
   LogoutIcon,
+  ScraperIcon,
 } from '../icons';
 
 const AdminSidebar: React.FC = () => {
