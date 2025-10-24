@@ -1,0 +1,7 @@
+{
+  "name": "Éclat Commerce",
+  "description": "A modern, full-featured e-commerce web application designed for a seamless user experience. It includes product browsing, filtering, a dynamic shopping cart, a wishlist, and a streamlined checkout process, all wrapped in a responsive and aesthetically pleasing design.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
