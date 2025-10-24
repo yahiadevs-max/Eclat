@@ -1,0 +1,298 @@
+-- =================================================================
+-- Script de création de la base de données pour Éclat Commerce
+-- =================================================================
+
+-- Désactivation des contraintes de clé étrangère pour le chargement des données
+SET FOREIGN_KEY_CHECKS=0;
+
+-- Suppression des tables existantes pour une réinitialisation propre
+DROP TABLE IF EXISTS `return_requests`, `payments`, `deliveries`, `shipping_costs`, `order_items`, `orders`, `customers`, `product_images`, `product_sizes`, `product_colors`, `products`, `subcategories`, `categories`, `brands`, `admin_permissions`, `admins`, `blog_posts`;
+
+-- =================================================================
+-- Création des Tables
+-- =================================================================
+
+-- Table: brands
+CREATE TABLE `brands` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: categories
+CREATE TABLE `categories` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: subcategories
+CREATE TABLE `subcategories` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `category_id` INT NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  UNIQUE(`category_id`, `name`),
+  FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: products
+CREATE TABLE `products` (
+  `id` INT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL,
+  `brand_id` INT,
+  `price` DECIMAL(10, 2) NOT NULL,
+  `category_id` INT,
+  `subcategory_id` INT,
+  `description` TEXT,
+  `stock` INT NOT NULL DEFAULT 0,
+  `rating` DECIMAL(2, 1) NOT NULL DEFAULT 0.0,
+  `reviews` INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (`brand_id`) REFERENCES `brands`(`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`subcategory_id`) REFERENCES `subcategories`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: product_images
+CREATE TABLE `product_images` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `product_id` INT NOT NULL,
+  `image_url` VARCHAR(255) NOT NULL,
+  `is_primary` BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: product_sizes
+CREATE TABLE `product_sizes` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `product_id` INT NOT NULL,
+  `size` VARCHAR(50) NOT NULL,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: product_colors
+CREATE TABLE `product_colors` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `product_id` INT NOT NULL,
+  `color` VARCHAR(50) NOT NULL,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: customers
+CREATE TABLE `customers` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: orders
+CREATE TABLE `orders` (
+  `id` VARCHAR(255) PRIMARY KEY,
+  `customer_id` INT,
+  `order_date` DATE NOT NULL,
+  `total` DECIMAL(10, 2) NOT NULL,
+  `status` ENUM('En attente', 'Expédiée', 'Livrée', 'Annulée') NOT NULL,
+  FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: order_items
+CREATE TABLE `order_items` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `order_id` VARCHAR(255) NOT NULL,
+  `product_id` INT NOT NULL,
+  `quantity` INT NOT NULL,
+  FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: admins
+CREATE TABLE `admins` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `username` VARCHAR(255) NOT NULL UNIQUE,
+  `email` VARCHAR(255) NOT NULL UNIQUE,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `role` ENUM('superadmin', 'admin') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: admin_permissions
+CREATE TABLE `admin_permissions` (
+  `admin_id` INT NOT NULL,
+  `permission` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`admin_id`, `permission`),
+  FOREIGN KEY (`admin_id`) REFERENCES `admins`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: shipping_costs
+CREATE TABLE `shipping_costs` (
+  `wilaya` VARCHAR(255) PRIMARY KEY,
+  `cost` DECIMAL(10, 2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: deliveries
+CREATE TABLE `deliveries` (
+  `order_id` VARCHAR(255) PRIMARY KEY,
+  `customer_name` VARCHAR(255),
+  `address` VARCHAR(255),
+  `shipping_date` VARCHAR(255),
+  `tracking_number` VARCHAR(255),
+  `status` ENUM('Préparation', 'Expédiée', 'En transit', 'Livrée') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: payments
+CREATE TABLE `payments` (
+  `transaction_id` VARCHAR(255) PRIMARY KEY,
+  `order_id` VARCHAR(255) NOT NULL,
+  `customer_name` VARCHAR(255),
+  `amount` DECIMAL(10, 2) NOT NULL,
+  `payment_date` DATE NOT NULL,
+  `status` ENUM('Réussi', 'En attente', 'Échoué', 'Remboursé') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: return_requests
+CREATE TABLE `return_requests` (
+  `request_id` VARCHAR(255) PRIMARY KEY,
+  `order_id` VARCHAR(255) NOT NULL,
+  `customer_name` VARCHAR(255),
+  `product_name` VARCHAR(255),
+  `reason` TEXT,
+  `request_date` DATE,
+  `status` ENUM('Demandé', 'Approuvé', 'Rejeté', 'Terminé') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: blog_posts
+CREATE TABLE `blog_posts` (
+  `id` INT PRIMARY KEY,
+  `title` VARCHAR(255) NOT NULL,
+  `author` VARCHAR(255),
+  `publish_date` DATE,
+  `excerpt` TEXT,
+  `image_url` VARCHAR(255)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- =================================================================
+-- Insertion des Données
+-- =================================================================
+
+-- Data: brands
+INSERT INTO `brands` (`name`) VALUES
+('ÉcoMode'), ('Denim & Co'), ('Urban Walkers'), ('Fleur Chic'), ('Aventure Urbaine'), ('Le Temps Précis'), ('Chaleur Douce'), ('Essence Rare'), ('BellePeau'), ('L\'Élégant');
+
+-- Data: categories
+INSERT INTO `categories` (`name`) VALUES
+('Hommes'), ('Femmes'), ('Accessoires'), ('Soins & Beauté');
+
+-- Data: subcategories
+INSERT INTO `subcategories` (`category_id`, `name`) VALUES
+(1, 'T-shirts'), (1, 'Jeans'), (1, 'Chaussures'), (1, 'Chemises'),
+(2, 'Robes'), (2, 'Pulls'), (2, 'Bottes'), (2, 'Jupes'),
+(3, 'Sacs'), (3, 'Montres'),
+(4, 'Parfums'), (4, 'Crèmes');
+
+-- Data: products
+INSERT INTO `products` (`id`, `name`, `brand_id`, `price`, `category_id`, `subcategory_id`, `description`, `stock`, `rating`, `reviews`) VALUES
+(1, 'T-shirt en Coton Bio', 1, 29.99, 1, 1, 'Un t-shirt confortable et durable, fabriqué à partir de 100% coton biologique. Parfait pour un usage quotidien.', 50, 4.5, 120),
+(2, 'Jean Slim Fit Délavé', 2, 79.90, 1, 2, 'Un jean slim fit moderne avec un effet délavé tendance. Tissu extensible pour un confort optimal.', 35, 4.7, 85),
+(3, 'Baskets de Ville en Cuir', 3, 119.99, 1, 3, 'Des baskets élégantes en cuir véritable, idéales pour un look casual chic. Semelle en caoutchouc durable.', 25, 4.8, 210),
+(4, 'Robe d\'Été Florale', 4, 65.00, 2, 5, 'Une robe légère et fluide avec un imprimé floral. Parfaite pour les journées ensoleillées.', 40, 4.6, 95),
+(5, 'Sac à Dos en Toile', 5, 55.50, 3, 9, 'Un sac à dos pratique et robuste en toile épaisse, avec de multiples compartiments. Idéal pour le quotidien ou les escapades.', 60, 4.4, 78),
+(6, 'Montre Classique Acier', 6, 250.00, 3, 10, 'Une montre élégante avec un bracelet en acier inoxydable et un cadran minimaliste. Mouvement à quartz japonais.', 15, 4.9, 150),
+(7, 'Pull en Laine Mérinos', 7, 99.99, 2, 6, 'Un pull doux et chaud en 100% laine mérinos. Parfait pour l\'hiver.', 30, 4.8, 110),
+(8, 'Bottes en Cuir Chelsea', 3, 145.00, 2, 7, 'Bottes Chelsea intemporelles en cuir de qualité supérieure. Faciles à enfiler et polyvalentes.', 20, 4.7, 130),
+(9, 'Parfum \'Nuit Étoilée\'', 8, 85.00, 4, 11, 'Une fragrance envoûtante et mystérieuse pour des soirées inoubliables. Notes de jasmin, de vanille et de bois de santal.', 40, 4.9, 180),
+(10, 'Crème Hydratante \'Source de Jeunesse\'', 9, 45.50, 4, 12, 'Un soin visage intensément hydratant à l\'acide hyaluronique pour une peau visiblement plus jeune et éclatante.', 75, 4.7, 250),
+(11, 'Chemise en Lin', 10, 69.90, 1, 4, 'Chemise légère et respirante en pur lin, parfaite pour l\'été. Coupe ajustée moderne.', 50, 4.6, 90),
+(12, 'Jupe Plissée Mi-longue', 4, 59.99, 2, 8, 'Jupe plissée élégante et polyvalente. Tissu fluide et agréable à porter en toute saison.', 45, 4.8, 115);
+
+-- Data: product_images
+INSERT INTO `product_images` (`product_id`, `image_url`, `is_primary`) VALUES
+(1, 'https://picsum.photos/id/10/800/800', TRUE), (1, 'https://picsum.photos/id/11/800/800', FALSE),
+(2, 'https://picsum.photos/id/20/800/800', TRUE), (2, 'https://picsum.photos/id/21/800/800', FALSE),
+(3, 'https://picsum.photos/id/30/800/800', TRUE), (3, 'https://picsum.photos/id/31/800/800', FALSE),
+(4, 'https://picsum.photos/id/40/800/800', TRUE), (4, 'https://picsum.photos/id/41/800/800', FALSE),
+(5, 'https://picsum.photos/id/50/800/800', TRUE), (5, 'https://picsum.photos/id/51/800/800', FALSE),
+(6, 'https://picsum.photos/id/60/800/800', TRUE), (6, 'https://picsum.photos/id/61/800/800', FALSE),
+(7, 'https://picsum.photos/id/70/800/800', TRUE), (7, 'https://picsum.photos/id/71/800/800', FALSE),
+(8, 'https://picsum.photos/id/80/800/800', TRUE), (8, 'https://picsum.photos/id/81/800/800', FALSE),
+(9, 'https://picsum.photos/id/90/800/800', TRUE), (9, 'https://picsum.photos/id/91/800/800', FALSE),
+(10, 'https://picsum.photos/id/100/800/800', TRUE), (10, 'https://picsum.photos/id/101/800/800', FALSE),
+(11, 'https://picsum.photos/id/110/800/800', TRUE), (11, 'https://picsum.photos/id/111/800/800', FALSE),
+(12, 'https://picsum.photos/id/120/800/800', TRUE), (12, 'https://picsum.photos/id/121/800/800', FALSE);
+
+-- Data: product_sizes
+INSERT INTO `product_sizes` (`product_id`, `size`) VALUES
+(1, 'S'), (1, 'M'), (1, 'L'), (1, 'XL'),
+(2, '30'), (2, '32'), (2, '34'), (2, '36'),
+(3, '40'), (3, '41'), (3, '42'), (3, '43'), (3, '44'),
+(4, 'S'), (4, 'M'), (4, 'L'),
+(7, 'S'), (7, 'M'), (7, 'L'), (7, 'XL'),
+(8, '40'), (8, '41'), (8, '42'), (8, '43'),
+(11, 'S'), (11, 'M'), (11, 'L'), (11, 'XL'),
+(12, 'S'), (12, 'M'), (12, 'L');
+
+-- Data: product_colors
+INSERT INTO `product_colors` (`product_id`, `color`) VALUES
+(1, 'Blanc'), (1, 'Noir'), (1, 'Bleu Marine'),
+(2, 'Bleu Clair'),
+(3, 'Blanc'), (3, 'Noir'),
+(4, 'Rouge'), (4, 'Jaune'),
+(5, 'Kaki'), (5, 'Gris'), (5, 'Noir'),
+(7, 'Gris Chiné'), (7, 'Bordeaux'), (7, 'Vert Forêt'),
+(8, 'Noir'), (8, 'Marron Foncé'),
+(11, 'Blanc'), (11, 'Bleu Ciel'), (11, 'Beige'),
+(12, 'Noir'), (12, 'Rose Poudré'), (12, 'Vert Émeraude');
+
+-- Data: customers
+INSERT INTO `customers` (`id`, `name`) VALUES
+(1, 'Alice Martin'), (2, 'Bob Dupont'), (3, 'Claire Durand'), (4, 'David Petit');
+
+-- Data: orders
+INSERT INTO `orders` (`id`, `customer_id`, `order_date`, `total`, `status`) VALUES
+('#123-456789', 1, '2024-05-20', 109.89, 'Livrée'),
+('#123-456790', 2, '2024-05-21', 119.99, 'Expédiée'),
+('#123-456791', 3, '2024-05-22', 120.50, 'En attente'),
+('#123-456792', 4, '2024-05-18', 250.00, 'Annulée');
+
+-- Data: order_items
+INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`) VALUES
+('#123-456789', 1, 1),
+('#123-456789', 2, 1),
+('#123-456790', 3, 1),
+('#123-456791', 4, 1),
+('#123-456791', 5, 1),
+('#123-456792', 6, 1);
+
+-- Data: admins
+INSERT INTO `admins` (`id`, `username`, `email`, `password_hash`, `role`) VALUES
+(1, 'yahia', 'yahia.admin@eclat.com', '...hashed_password...', 'superadmin'),
+(2, 'admin', 'admin.user@eclat.com', '...hashed_password...', 'admin');
+
+-- Data: admin_permissions
+INSERT INTO `admin_permissions` (`admin_id`, `permission`) VALUES
+(2, 'products'), (2, 'orders'), (2, 'shipping'), (2, 'scraper');
+
+-- Data: shipping_costs
+INSERT INTO `shipping_costs` (`wilaya`, `cost`) VALUES
+('Adrar', 800), ('Chlef', 500), ('Laghouat', 700), ('Oum El Bouaghi', 600), ('Batna', 600), ('Béjaïa', 500), ('Biskra', 700),
+('Béchar', 900), ('Blida', 400), ('Bouira', 500), ('Tamanrasset', 1200), ('Tébessa', 700), ('Tlemcen', 600), ('Tiaret', 600),
+('Tizi Ouzou', 450), ('Alger', 350), ('Djelfa', 650), ('Jijel', 550), ('Sétif', 550), ('Saïda', 700), ('Skikda', 600),
+('Sidi Bel Abbès', 600), ('Annaba', 650), ('Guelma', 650), ('Constantine', 550), ('Médéa', 450), ('Mostaganem', 550),
+('M\'Sila', 600), ('Mascara', 600), ('Ouargla', 800), ('Oran', 550), ('El Bayadh', 750), ('Illizi', 1300), ('Bordj Bou Arreridj', 500),
+('Boumerdès', 400), ('El Tarf', 700), ('Tindouf', 1500), ('Tissemsilt', 550), ('El Oued', 750), ('Khenchela', 650),
+('Souk Ahras', 700), ('Tipaza', 400), ('Mila', 600), ('Aïn Defla', 450), ('Naâma', 800), ('Aïn Témouchent', 600),
+('Ghardaïa', 750), ('Relizane', 550);
+
+-- Data: deliveries
+INSERT INTO `deliveries` (`order_id`, `customer_name`, `address`, `shipping_date`, `tracking_number`, `status`) VALUES
+('#123-456789', 'Alice Martin', '123 Rue de Paris, 75001 Paris', '2024-05-21', 'LP123456789FR', 'Livrée'),
+('#123-456790', 'Bob Dupont', '45 Avenue de Lyon, 69002 Lyon', '2024-05-22', 'LP987654321FR', 'En transit'),
+('#123-456791', 'Claire Durand', '78 Boulevard de Marseille, 13008 Marseille', 'N/A', 'N/A', 'Préparation');
+
+-- Data: payments
+INSERT INTO `payments` (`transaction_id`, `order_id`, `customer_name`, `amount`, `payment_date`, `status`) VALUES
+('txn_1a2b3c4d5e', '#123-456789', 'Alice Martin', 109.89, '2024-05-20', 'Réussi'),
+('txn_6f7g8h9i0j', '#123-456790', 'Bob Dupont', 119.99, '2024-05-21', 'Réussi'),
+('txn_k1l2m3n4o5', '#123-456791', 'Claire Durand', 120.50, '2024-05-22', 'En attente'),
+('txn_p6q7r8s9t0', '#123-456792', 'David Petit', 250.00, '2024-05-18', 'Échoué'),
+('txn_u1v2w3x4y5', '#123-456788', 'Eve Leroy', 99.99, '2024-05-17', 'Remboursé');
+
+-- Data: return_requests
+INSERT INTO `return_requests` (`request_id`, `order_id`, `customer_name`, `product_name`, `reason`, `request_date`, `status`) VALUES
+('RTN-001', '#123-456789', 'Alice Martin', 'T-shirt en Coton Bio', 'Taille incorrecte', '2024-05-23', 'Demandé'),
+('RTN-002', '#123-45
