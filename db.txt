@@ -260,8 +260,8 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`) VALUES
 
 -- Data: admins
 INSERT INTO `admins` (`id`, `username`, `email`, `password_hash`, `role`) VALUES
-(1, 'yahia', 'yahia.admin@eclat.com', '...hashed_password...', 'superadmin'),
-(2, 'admin', 'admin.user@eclat.com', '...hashed_password...', 'admin');
+(1, 'yahia', 'yahia.admin@eclat.com', '$2a$10$w8.Y2w.N8Q.z9c5.j5BwTeStgX.a2y.d1XG/V5GzLzG2aW/vK2Iq.', 'superadmin'),
+(2, 'admin', 'admin.user@eclat.com', '$2a$10$oFjC.pD5e6e7f8.g9H.i.e/uJ.Z3k.l4O5B6j7K8l9M0n1o2p3q.', 'admin');
 
 -- Data: admin_permissions
 INSERT INTO `admin_permissions` (`admin_id`, `permission`) VALUES
@@ -282,17 +282,4 @@ INSERT INTO `shipping_costs` (`wilaya`, `cost`) VALUES
 INSERT INTO `deliveries` (`order_id`, `customer_name`, `address`, `shipping_date`, `tracking_number`, `status`) VALUES
 ('#123-456789', 'Alice Martin', '123 Rue de Paris, 75001 Paris', '2024-05-21', 'LP123456789FR', 'Livrée'),
 ('#123-456790', 'Bob Dupont', '45 Avenue de Lyon, 69002 Lyon', '2024-05-22', 'LP987654321FR', 'En transit'),
-('#123-456791', 'Claire Durand', '78 Boulevard de Marseille, 13008 Marseille', 'N/A', 'N/A', 'Préparation');
-
--- Data: payments
-INSERT INTO `payments` (`transaction_id`, `order_id`, `customer_name`, `amount`, `payment_date`, `status`) VALUES
-('txn_1a2b3c4d5e', '#123-456789', 'Alice Martin', 109.89, '2024-05-20', 'Réussi'),
-('txn_6f7g8h9i0j', '#123-456790', 'Bob Dupont', 119.99, '2024-05-21', 'Réussi'),
-('txn_k1l2m3n4o5', '#123-456791', 'Claire Durand', 120.50, '2024-05-22', 'En attente'),
-('txn_p6q7r8s9t0', '#123-456792', 'David Petit', 250.00, '2024-05-18', 'Échoué'),
-('txn_u1v2w3x4y5', '#123-456788', 'Eve Leroy', 99.99, '2024-05-17', 'Remboursé');
-
--- Data: return_requests
-INSERT INTO `return_requests` (`request_id`, `order_id`, `customer_name`, `product_name`, `reason`, `request_date`, `status`) VALUES
-('RTN-001', '#123-456789', 'Alice Martin', 'T-shirt en Coton Bio', 'Taille incorrecte', '2024-05-23', 'Demandé'),
-('RTN-002', '#123-45
+('#123-45

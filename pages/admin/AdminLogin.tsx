@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminLogin: React.FC = () => {
@@ -50,10 +50,16 @@ const AdminLogin: React.FC = () => {
             />
           </div>
           {error && <p className="text-sm text-center text-red-600">{error}</p>}
-          <div>
+          <div className="pt-2 space-y-4">
             <button type="submit" className="w-full px-4 py-3 font-semibold text-white bg-accent rounded-md hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors">
               Se connecter
             </button>
+            <Link 
+              to="/" 
+              className="block w-full text-center px-4 py-3 font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors"
+            >
+              Annuler
+            </Link>
           </div>
         </form>
       </div>
